@@ -51,7 +51,9 @@ The spec notes that using "Add to Home Screen" from the cover-screen browser has
 ## Playing a Game
 
 1. Open flip-chess from the cover-screen widget
-2. Click the **Start Matchmaking** button and select a time control (Bullet, Blitz, Rapid, etc.)
+2. Pick a time control and whether the game is rated. Only Rapid and slower
+   controls are offered: Lichess's Board API refuses to pair anything faster,
+   so Bullet and Blitz tiles would fail on tap.
 3. Wait for an opponent to be found
 4. Play your moves directly on the board
 5. The clock counts down in real time; your move notifies you with a vibration

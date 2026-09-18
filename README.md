@@ -102,6 +102,10 @@ For a detailed explanation of the app's architecture, data flow, and authenticat
 [implementation plan](docs/superpowers/plans/2026-09-18-flip-chess-implementation.md),
 which records the decisions the spec deliberately left open.
 
+## Third-party assets
+
+The chess piece artwork (`src/ui/pieces.ts`) is the Cburnett set by Colin M.L. Burnett, used here under the BSD-3-Clause license; see [docs/licenses/cburnett-pieces.md](docs/licenses/cburnett-pieces.md) for full attribution and license text.
+
 ## License
 
 MIT

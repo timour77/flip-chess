@@ -52,7 +52,19 @@ Everything runs client-side in the browser. The personal API token (`board:play`
 - Game discovery: opens `GET /api/stream/event` on load to learn about the current/next game (`gameStart` events) and any ongoing game already in progress.
 - Live game state: for the active game, opens `GET /api/board/game/stream/{gameId}`, consuming `gameFull` (initial state) then `gameState` (moves, clocks, status) events.
 - Actions: `POST /api/board/game/{gameId}/move/{uci}` (make a move), `POST /api/board/game/{gameId}/resign`, `POST /api/board/game/{gameId}/draw/yes` (offer/accept draw).
-- Matchmaking: `POST /api/board/seek` with the user-chosen time control (any value, including Blitz/Bullet — no restriction, per [research](https://github.com/timour77/flip-chess/issues/3)) and rated/casual flag.
+- Matchmaking: `POST /api/board/seek` with the user-chosen time control and rated/casual flag.
+
+  > **Correction (2026-09-18, found in implementation).** This spec originally
+  > recorded "any value, including Blitz/Bullet — no restriction, per
+  > [research](https://github.com/timour77/flip-chess/issues/3)". That is wrong,
+  > and every Bullet and Blitz preset shipped on the strength of it failed on
+  > tap. lila validates a board seek with `boardApiHook`, which rejects it with
+  > "Invalid time control" unless the clock is **Rapid or slower** — that is,
+  > `limit + 40 x increment >= 480` seconds (scalachess `Clock.estimateTotalSeconds`
+  > and `Speed`). The published OpenAPI schema does not mention this; it documents
+  > only `time` 0-180 and `increment` 0-180, so the rule is invisible until a
+  > real seek comes back rejected. `src/config.ts` now encodes the floor and a
+  > unit test holds every shipped preset to it.
 
 **Notification**
 - On receiving a `gameState` event where it becomes the player's turn, trigger the [Vibration API](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API) and, where supported, a screen-wake hint. No push notifications when the PWA isn't open — out of scope (see below).

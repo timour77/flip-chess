@@ -1,133 +1,73 @@
 /**
- * Inline SVG piece sprites for the board renderer.
+ * Piece sprites for the board renderer: the genuine Cburnett artwork used by
+ * lichess.org, not a hand-drawn approximation.
  *
- * Shapes are authored once per piece type (viewBox 0 0 45 45, matching the
- * classic chess-SVG convention) and coloured at build time via CSS custom
- * properties, so there is no interpolated markup anywhere — every node is
- * built through the DOM API.
+ * Author: Colin M.L. Burnett. Burnett multi-licensed this set under the
+ * GFDL, BSD-3-Clause, CC-BY-SA-3.0 and GPL; this project is MIT-licensed, so
+ * we elect the **BSD-3-Clause** option (permissive, MIT-compatible — the GPL
+ * option would force this project copyleft). Full license text and
+ * provenance: ../../docs/licenses/cburnett-pieces.md
+ *
+ * The markup below (`PIECE_MARKUP`) is the original SVG source copied
+ * verbatim from lichess-org/lila's `public/piece/cburnett/*.svg`, one
+ * module-level string constant per piece+color. Each string is a static
+ * compile-time literal defined only in this file — never runtime data, user
+ * input or anything interpolated — so assigning it to `innerHTML` on a
+ * namespaced SVG element below is not a sanitization concern.
  */
 
 import type { Color, PieceType } from '../types';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-function svgNode(tag: string, attrs: Record<string, string>): SVGElement {
-  const node = document.createElementNS(SVG_NS, tag);
-  for (const [name, value] of Object.entries(attrs)) {
-    node.setAttribute(name, value);
-  }
-  return node;
-}
+type PieceKey = 'wK' | 'wQ' | 'wR' | 'wB' | 'wN' | 'wP' | 'bK' | 'bQ' | 'bR' | 'bB' | 'bN' | 'bP';
 
-/** Body trapezoid shared by the queen and king (their crown/cross differ above it). */
-const ROYAL_BODY_D = 'M15 32 L30 32 L28 19 L17 19 Z';
-const ROYAL_BASE_ATTRS = { x: '13', y: '32', width: '19', height: '5', rx: '1.2' };
+/**
+ * Inner SVG markup for each piece, viewBox 0 0 45 45, verbatim from the
+ * Cburnett set (lichess-org/lila `public/piece/cburnett`). Colors (white
+ * `#fff` fills with `#000` outlines, black `#000` fills) are baked into the
+ * artwork itself, matching lichess's own rendering exactly — do not recolor
+ * these via CSS.
+ */
+const PIECE_MARKUP: Record<PieceKey, string> = {
+  wK: `<g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path stroke-linejoin="miter" d="M22.5 11.63V6M20 8h5"/><path fill="#fff" stroke-linecap="butt" stroke-linejoin="miter" d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5"/><path fill="#fff" d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10z"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0"/></g>`,
+  wQ: `<g fill="#fff" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M8 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0m16.5-4.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0M41 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0M16 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0M33 9a2 2 0 1 1-4 0 2 2 0 1 1 4 0"/><path stroke-linecap="butt" d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14z"/><path stroke-linecap="butt" d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path fill="none" d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0"/></g>`,
+  wR: `<g fill="#fff" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path stroke-linecap="butt" d="M9 39h27v-3H9zm3-3v-4h21v4zm-1-22V9h4v2h5V9h5v2h5V9h4v5"/><path d="m34 14-3 3H14l-3-3"/><path stroke-linecap="butt" stroke-linejoin="miter" d="M31 17v12.5H14V17"/><path d="m31 29.5 1.5 2.5h-20l1.5-2.5"/><path fill="none" stroke-linejoin="miter" d="M11 14h23"/></g>`,
+  wB: `<g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><g fill="#fff" stroke-linecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.35.49-2.32.47-3-.5 1.35-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><path d="M25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/></g><path stroke-linejoin="miter" d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5"/></g>`,
+  wN: `<g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path fill="#fff" d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21"/><path fill="#fff" d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4.003 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-.994-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-1.992 2.5-3c1 0 1 3 1 3"/><path fill="#000" d="M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0m5.433-9.75a.5 1.5 30 1 1-.866-.5.5 1.5 30 1 1 .866.5"/></g>`,
+  wP: `<path fill="#fff" stroke="#000" stroke-linecap="round" stroke-width="1.5" d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z"/>`,
+  bK: `<g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path stroke-linejoin="miter" d="M22.5 11.6V6"/><path fill="#000" stroke-linecap="butt" stroke-linejoin="miter" d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5"/><path fill="#000" d="M11.5 37a22.3 22.3 0 0 0 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10z"/><path stroke-linejoin="miter" d="M20 8h5"/><path stroke="#ececec" d="M32 29.5s8.5-4 6-9.7C34.1 14 25 18 22.5 24.6v2.1-2.1C20 18 9.9 14 7 19.9c-2.5 5.6 4.8 9 4.8 9"/><path stroke="#ececec" d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0"/></g>`,
+  bQ: `<g fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><g stroke="none"><circle cx="6" cy="12" r="2.75"/><circle cx="14" cy="9" r="2.75"/><circle cx="22.5" cy="8" r="2.75"/><circle cx="31" cy="9" r="2.75"/><circle cx="39" cy="12" r="2.75"/></g><path stroke-linecap="butt" d="M9 26c8.5-1.5 21-1.5 27 0l2.5-12.5L31 25l-.3-14.1-5.2 13.6-3-14.5-3 14.5-5.2-13.6L14 25 6.5 13.5z"/><path stroke-linecap="butt" d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path fill="none" stroke-linecap="butt" d="M11 38.5a35 35 1 0 0 23 0"/><path fill="none" stroke="#ececec" d="M11 29a35 35 1 0 1 23 0m-21.5 2.5h20m-21 3a35 35 1 0 0 22 0m-23 3a35 35 1 0 0 24 0"/></g>`,
+  bR: `<g fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path stroke-linecap="butt" d="M9 39h27v-3H9zm3.5-7 1.5-2.5h17l1.5 2.5zm-.5 4v-4h21v4z"/><path stroke-linecap="butt" stroke-linejoin="miter" d="M14 29.5v-13h17v13z"/><path stroke-linecap="butt" d="M14 16.5 11 14h23l-3 2.5zM11 14V9h4v2h5V9h5v2h5V9h4v5z"/><path fill="none" stroke="#ececec" stroke-linejoin="miter" stroke-width="1" d="M12 35.5h21m-20-4h19m-18-2h17m-17-13h17M11 14h23"/></g>`,
+  bB: `<g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><g fill="#000" stroke-linecap="butt"><path d="M9 36c3.4-1 10.1.4 13.5-2 3.4 2.4 10.1 1 13.5 2 0 0 1.6.5 3 2-.7 1-1.6 1-3 .5-3.4-1-10.1.5-13.5-1-3.4 1.5-10.1 0-13.5 1-1.4.5-2.3.5-3-.5 1.4-2 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><path d="M25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/></g><path stroke="#ececec" stroke-linejoin="miter" d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5"/></g>`,
+  bN: `<g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path fill="#000" d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21"/><path fill="#000" d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.04-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-1-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-2 2.5-3c1 0 1 3 1 3"/><path fill="#ececec" stroke="#ececec" d="M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0m5.43-9.75a.5 1.5 30 1 1-.86-.5.5 1.5 30 1 1 .86.5"/><path fill="#ececec" stroke="none" d="m24.55 10.4-.45 1.45.5.15c3.15 1 5.65 2.49 7.9 6.75S35.75 29.06 35.25 39l-.05.5h2.25l.05-.5c.5-10.06-.88-16.85-3.25-21.34s-5.79-6.64-9.19-7.16z"/></g>`,
+  bP: `<path stroke="#000" stroke-linecap="round" stroke-width="1.5" d="M22.5 9a4 4 0 0 0-3.22 6.38 6.48 6.48 0 0 0-.87 10.65c-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47a6.46 6.46 0 0 0-.87-10.65A4.01 4.01 0 0 0 22.5 9z"/>`,
+};
 
-function pawnShapes(): SVGElement[] {
-  return [
-    svgNode('circle', { cx: '22.5', cy: '13', r: '6' }),
-    svgNode('path', {
-      d: 'M22.5 19 C17.5 19 14.5 23 15.5 27.5 L13.5 36 L31.5 36 L29.5 27.5 C30.5 23 27.5 19 22.5 19 Z',
-    }),
-  ];
-}
-
-function rookShapes(): SVGElement[] {
-  return [
-    svgNode('path', { d: 'M13 9 H18 V12.5 H21 V9 H24 V12.5 H27 V9 H32 V18 H13 Z' }),
-    svgNode('path', { d: 'M16 18 L29 18 L27 31 L18 31 Z' }),
-    svgNode('rect', { x: '12', y: '31', width: '21', height: '5', rx: '1.2' }),
-  ];
-}
-
-function knightShapes(strokeColor: string): SVGElement[] {
-  return [
-    svgNode('path', {
-      d: 'M31 36 H15 C15 31 16.5 29 15.5 25.5 C14 21.5 12 18 14.5 13.5 C16.5 10 20.5 8.5 23.5 10.5 C25.5 8.5 29 9 30 11.5 C31.5 14.5 29.5 16.5 30.5 18.5 C32.5 20.5 33.5 23.5 32.5 27 L29.5 26.5 L28.5 22.5 L26.5 24.5 L27.5 28.5 C28.5 31.5 30 33.5 31 36 Z',
-    }),
-    svgNode('circle', { cx: '24.5', cy: '14.5', r: '1.1', fill: strokeColor }),
-  ];
-}
-
-function bishopShapes(strokeColor: string): SVGElement[] {
-  return [
-    svgNode('path', {
-      d: 'M22.5 10 C19 10.5 17.3 13.3 18.3 16 C15.3 18 13.5 22 14.5 26 C15.5 30 18.5 32 22.5 32 C26.5 32 29.5 30 30.5 26 C31.5 22 29.7 18 26.7 16 C27.7 13.3 26 10.5 22.5 10 Z',
-    }),
-    svgNode('circle', { cx: '22.5', cy: '7', r: '2.3' }),
-    svgNode('rect', { x: '15', y: '32', width: '15', height: '4', rx: '1.2' }),
-    svgNode('path', {
-      d: 'M18.5 18 L26.5 22.5',
-      stroke: strokeColor,
-      fill: 'none',
-      'stroke-width': '1.4',
-      'stroke-linecap': 'round',
-    }),
-  ];
-}
-
-function queenShapes(): SVGElement[] {
-  return [
-    svgNode('path', { d: 'M14 21 L15.5 13 L19.5 17.5 L22.5 10.5 L25.5 17.5 L29.5 13 L31 21 Z' }),
-    svgNode('path', { d: ROYAL_BODY_D }),
-    svgNode('rect', ROYAL_BASE_ATTRS),
-  ];
-}
-
-function kingShapes(): SVGElement[] {
-  return [
-    svgNode('rect', { x: '21', y: '6', width: '3', height: '9' }),
-    svgNode('rect', { x: '18.5', y: '9', width: '8', height: '3' }),
-    svgNode('circle', { cx: '22.5', cy: '18', r: '4' }),
-    svgNode('path', { d: ROYAL_BODY_D }),
-    svgNode('rect', ROYAL_BASE_ATTRS),
-  ];
-}
-
-function buildShape(type: PieceType, strokeColor: string): SVGElement[] {
-  switch (type) {
-    case 'p':
-      return pawnShapes();
-    case 'r':
-      return rookShapes();
-    case 'n':
-      return knightShapes(strokeColor);
-    case 'b':
-      return bishopShapes(strokeColor);
-    case 'q':
-      return queenShapes();
-    case 'k':
-      return kingShapes();
-  }
+function pieceKey(type: PieceType, color: Color): PieceKey {
+  const letter = (color === 'white' ? 'w' : 'b') as 'w' | 'b';
+  return `${letter}${type.toUpperCase()}` as PieceKey;
 }
 
 /**
- * Builds one piece sprite. Colours come from the `--piece-*` custom
- * properties declared in `styles/board.css` (not the board/square tokens
- * from `base.css`, which don't cover piece colour).
+ * Builds one piece sprite as a namespaced `<svg>` whose contents are the
+ * verbatim Cburnett markup for that piece+color (see `PIECE_MARKUP` above).
+ * Carries no intrinsic size: `.piece-svg` in board.css scales it to its
+ * square, so the board owns the piece's displayed size.
  */
 export function pieceElement(type: PieceType, color: Color): SVGElement {
-  const fill = color === 'white' ? 'var(--piece-white)' : 'var(--piece-black)';
-  const stroke = color === 'white' ? 'var(--piece-white-stroke)' : 'var(--piece-black-stroke)';
+  const svg = document.createElementNS(SVG_NS, 'svg') as SVGElement;
+  svg.setAttribute('viewBox', '0 0 45 45');
+  svg.setAttribute('class', 'piece-svg');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  // Sizing lives in board.css on `.piece-svg`. An inline style here would beat
+  // every stylesheet rule and leave the board unable to tune how much of a
+  // square a piece fills.
 
-  const svg = svgNode('svg', {
-    viewBox: '0 0 45 45',
-    class: 'piece-svg',
-    'aria-hidden': 'true',
-    focusable: 'false',
-  });
+  // Safe: PIECE_MARKUP values are static literals defined above in this
+  // file, never runtime/user data, so this is not a sanitization concern.
+  svg.innerHTML = PIECE_MARKUP[pieceKey(type, color)];
 
-  const group = svgNode('g', {
-    fill,
-    stroke,
-    'stroke-width': '1.5',
-    'stroke-linejoin': 'round',
-    'stroke-linecap': 'round',
-  });
-
-  for (const shape of buildShape(type, stroke)) {
-    group.appendChild(shape);
-  }
-  svg.appendChild(group);
   return svg;
 }
