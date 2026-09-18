@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#161512" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Flip Chess</title>
+    <link rel="icon" href="icons/icon-192.png" />
+  </head>
+  <body>
+    <!--
+      Screen containers. Exactly one carries `data-active` at a time; the
+      router in src/app.ts owns that attribute. Each screen's contents are
+      rendered by its own module — see src/ui/.
+    -->
+    <div id="app">
+      <section id="screen-token" class="screen" data-screen="token"></section>
+      <section id="screen-idle" class="screen" data-screen="idle"></section>
+      <section id="screen-seeking" class="screen" data-screen="seeking"></section>
+      <section id="screen-game" class="screen" data-screen="game">
+        <div id="clock-opponent" class="clock" data-side="opponent"></div>
+        <div id="board"></div>
+        <div id="clock-own" class="clock" data-side="own"></div>
+        <div id="controls"></div>
+      </section>
+      <section id="screen-result" class="screen" data-screen="result"></section>
+      <div id="banner" class="banner" hidden></div>
+      <div id="promotion" class="promotion" hidden></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

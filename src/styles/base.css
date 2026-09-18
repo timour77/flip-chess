@@ -1,0 +1,135 @@
+/*
+ * Design tokens and the outer layout shell.
+ *
+ * Target viewport: the Galaxy Z Flip cover screen — roughly 350x380 CSS px of
+ * usable area, but the app must also survive a normal phone screen. Every size
+ * that matters is derived from `--unit`, which is driven by the smaller of the
+ * two viewport axes so the board always fits without scrolling.
+ */
+
+:root {
+  /* Lichess-ish dark palette: the cover screen is usually viewed in a hurry. */
+  --bg: #161512;
+  --surface: #262421;
+  --surface-hi: #302e2b;
+  --text: #dedcd8;
+  --text-dim: #9b988f;
+  --accent: #629924;
+  --accent-dim: #4a7a16;
+  --danger: #b03a2e;
+  --light-square: #f0d9b5;
+  --dark-square: #b58863;
+  --sel-square: rgba(20, 85, 30, 0.5);
+  --last-move: rgba(155, 199, 0, 0.41);
+  --check: radial-gradient(
+    ellipse at center,
+    rgba(255, 0, 0, 1) 0%,
+    rgba(231, 0, 0, 1) 25%,
+    rgba(169, 0, 0, 0) 89%
+  );
+
+  --radius: 6px;
+  --tap-min: 40px;
+
+  /*
+   * The board is square and is the dominant element: it takes the full width,
+   * capped so that board + two clocks + controls still fit vertically.
+   */
+  --board-size: min(100vw, calc(100dvh - 9.5rem));
+  --square: calc(var(--board-size) / 8);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.3;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+#app {
+  height: 100dvh;
+  width: 100vw;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Only the screen carrying `data-active` is shown; the router owns that flag. */
+.screen {
+  display: none;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.screen[data-active] {
+  display: flex;
+}
+
+#screen-game[data-active] {
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+/* Transient error / status banner, pinned to the top of the viewport. */
+.banner {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 0.4rem 0.6rem;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.banner[data-tone='info'] {
+  background: var(--surface-hi);
+  color: var(--text-dim);
+}
+
+.banner[hidden] {
+  display: none;
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-hi);
+  border: none;
+  border-radius: var(--radius);
+  min-height: var(--tap-min);
+  padding: 0 0.75rem;
+  cursor: pointer;
+}
+
+button:active {
+  background: var(--accent-dim);
+}
+
+button[disabled] {
+  opacity: 0.4;
+}
