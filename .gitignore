@@ -1,5 +1,12 @@
 node_modules/
 dist/
+
+# Secrets. The Lichess personal token must never be committed — but keep these
+# patterns anchored to real secret filenames: a bare `*token*` also matches
+# source files like src/ui/screens/token.ts and silently drops them from the
+# repo, which is how this rule first went wrong.
 .env
 .env.*
-*token*
+*.token
+.lichess-token
+token.txt

@@ -1,0 +1,165 @@
+/*
+ * Board + promotion picker styling.
+ *
+ * Square colours, selection/last-move/check highlights and sizing come from
+ * the design tokens in base.css (--light-square, --dark-square, --sel-square,
+ * --last-move, --check, --board-size, --square). Piece colours and
+ * destination-marker colours aren't covered by those tokens, so this file
+ * declares its own custom properties for them, additively (no existing
+ * token is redefined).
+ */
+
+:root {
+  --piece-white: #f7f4ee;
+  --piece-white-stroke: #2b2b28;
+  --piece-black: #2b2b28;
+  --piece-black-stroke: #f7f4ee;
+  --dest-marker: rgba(15, 14, 12, 0.4);
+}
+
+/* ------------------------------------------------------------------ *
+ * Board
+ * ------------------------------------------------------------------ */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, var(--square));
+  grid-template-rows: repeat(8, var(--square));
+  width: var(--board-size);
+  height: var(--board-size);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  touch-action: manipulation;
+}
+
+.board.board--disabled {
+  opacity: 0.85;
+}
+
+.square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.square.light {
+  background: var(--light-square);
+}
+
+.square.dark {
+  background: var(--dark-square);
+}
+
+.piece-svg {
+  width: 82%;
+  height: 82%;
+  display: block;
+  pointer-events: none;
+}
+
+.sq-underlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sq-underlay.is-selected {
+  background: var(--sel-square);
+}
+
+.sq-underlay.is-last-move {
+  background: var(--last-move);
+}
+
+.sq-underlay.is-check {
+  background: var(--check);
+}
+
+.sq-marker {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Empty legal destination: a centred dot. */
+.sq-marker.is-move::after {
+  content: '';
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: var(--dest-marker);
+}
+
+/* Capturable destination: a ring hugging the square edge. */
+.sq-marker.is-capture::after {
+  content: '';
+  width: 88%;
+  height: 88%;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 calc(var(--square) * 0.09) var(--dest-marker);
+}
+
+/* ------------------------------------------------------------------ *
+ * Promotion picker (#promotion in index.html)
+ * ------------------------------------------------------------------ */
+
+.promotion {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(10, 9, 8, 0.6);
+}
+
+.promotion[hidden] {
+  display: none;
+}
+
+.promotion__sheet {
+  width: 100%;
+  max-width: 26rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.promotion__option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 64px;
+  background: var(--surface-hi);
+  color: var(--text);
+}
+
+.promotion__option:active {
+  background: var(--accent-dim);
+}
+
+.promotion__icon {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+.promotion__icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.promotion__label {
+  font-size: 0.95rem;
+}
