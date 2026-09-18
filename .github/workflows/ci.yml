@@ -1,7 +1,10 @@
 name: CI
 
+# `push` is scoped to master so a branch with an open PR runs CI once (via
+# pull_request) instead of twice.
 on:
   push:
+    branches: [master]
   pull_request:
 
 jobs:
