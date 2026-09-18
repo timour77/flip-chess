@@ -29,7 +29,8 @@
   );
 
   --radius: 6px;
-  --tap-min: 40px;
+  /* Fingers are imprecise on a folded phone; 44px is the floor everywhere. */
+  --tap-min: 44px;
 
   /*
    * The board is square and is the dominant element: it takes the full width,
