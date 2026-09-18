@@ -26,7 +26,7 @@ npm run typecheck    # Type-check with TypeScript
 
 ```bash
 npm run build        # Build to dist/ (runs typecheck first)
-node scripts/generate-icons.mjs  # Generate app icons for the PWA manifest
+node scripts/generate-icons.mjs  # Regenerate the PWA icons (already committed)
 ```
 
 The app is deployed to GitHub Pages as a static site. See the [deploy workflow](.github/workflows/deploy.yml) for details.
@@ -36,13 +36,14 @@ The app is deployed to GitHub Pages as a static site. See the [deploy workflow](
 ```
 flip-chess/
 ├── src/
-│   ├── lichess/      # Lichess API client (OAuth token, seek, moves, stream events)
-│   ├── game/         # Chess rules & game state (board logic, move validation)
-│   ├── ui/           # DOM rendering (board, clock, controls)
-│   ├── types.ts      # Shared TypeScript types (Game, GameState, etc.)
-│   └── main.ts       # App entry point
+│   ├── lichess/      # Lichess API client: ND-JSON streams, seek, moves, resign/draw
+│   ├── game/         # chess.js adapter, clock model, game state store (no DOM)
+│   ├── ui/           # DOM rendering: board, clocks, controls, screens (no API access)
+│   ├── types.ts      # The shared contract every other module builds against
+│   ├── app.ts        # Wiring: streams -> store -> screens, and input back out
+│   └── main.ts       # Entry point
 ├── scripts/
-│   └── generate-icons.mjs  # Generate PNG icons (run before building)
+│   └── generate-icons.mjs  # Regenerates the PNG icons in public/icons
 ├── public/
 │   ├── icons/        # Generated app icons (192px, 512px, maskable)
 │   └── robots.txt    # Disallow crawlers (single-user app)
@@ -60,7 +61,9 @@ flip-chess/
 On first load, flip-chess will prompt you for a personal Lichess API token:
 
 1. Go to https://lichess.org/account/oauth/token/create
-2. Create a token with the `board:play` scope (required to play moves)
+2. Create a token with the `board:play` scope (required to play moves). This is a
+   personal access token, not an OAuth flow — the app is single-user by design and has
+   no backend to hold a client secret.
 3. Paste the token into the app — it's stored in your browser's localStorage and sent **only** to lichess.org
 4. See [Cover-Screen Setup](docs/cover-screen-setup.md) for device-specific instructions
 
@@ -73,10 +76,18 @@ To run flip-chess on a Galaxy Z Flip 7's cover screen, you'll need to use the Mu
 ## Playing
 
 1. Open flip-chess on the cover-screen browser
-2. Click **Start Matchmaking** and pick a time control (Bullet, Blitz, Rapid, etc.)
-3. Wait for an opponent to be paired
+2. Pick a time control and whether the game is rated — this opens a Lichess seek
+3. Wait for Lichess to pair you with an opponent
 4. Play moves on the board; the clock ticks down in real time
-5. You'll receive a vibration when it's your turn
+5. The phone vibrates when it becomes your turn
+
+Resign and draw offers are press-and-hold rather than tap, so a stray touch on a
+folded phone cannot end a game by accident.
+
+### Not in v1
+
+Challenging a specific player, chat, analysis, game history, and push notifications
+while the app is closed are all out of scope — see the design spec.
 
 ## Security & Privacy
 
@@ -87,7 +98,9 @@ To run flip-chess on a Galaxy Z Flip 7's cover screen, you'll need to use the Mu
 
 ## Design & Architecture
 
-For a detailed explanation of the app's architecture, data flow, and authentication model, see [Flip Chess: cover-screen Lichess board — design spec](docs/superpowers/specs/2026-09-18-flip-chess-design.md).
+For a detailed explanation of the app's architecture, data flow, and authentication model, see the [design spec](docs/superpowers/specs/2026-09-18-flip-chess-design.md) and the
+[implementation plan](docs/superpowers/plans/2026-09-18-flip-chess-implementation.md),
+which records the decisions the spec deliberately left open.
 
 ## License
 
