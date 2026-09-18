@@ -30,7 +30,12 @@ import { createSeekingScreen } from './ui/screens/seeking';
 import { createResultScreen } from './ui/screens/result';
 import { clearToken, loadRated, loadToken, saveRated, saveToken } from './storage';
 import { keepScreenAwake, vibrateGameOver, vibrateTurn } from './notify';
-import { LOW_TIME_MS, RESULT_SCREEN_MS, TIME_CONTROLS } from './config';
+import {
+  LOW_TIME_MS,
+  RESULT_SCREEN_MS,
+  TIME_CONTROLS,
+  isSeekableOnBoardApi,
+} from './config';
 import { LichessError } from './types';
 import type {
   Color,
@@ -226,6 +231,12 @@ export function startApp(): void {
         banner.show(`Lichess is rate limiting us. Retry in ${seconds}s.`, 'error', 5000);
         return;
       }
+      // Lichess explains its own refusals ("Invalid time control", ...). The
+      // generic fallback hid that and left the user guessing.
+      if (error.kind === 'rejected' && error.message) {
+        banner.show(`${fallback}: ${error.message}`, 'error', 6000);
+        return;
+      }
     }
     banner.show(fallback, 'error', 4000);
   }
@@ -370,6 +381,12 @@ export function startApp(): void {
 
   async function startSeek(preset: TimeControlPreset, isRated: boolean): Promise<void> {
     if (!client) return;
+    if (!isSeekableOnBoardApi(preset)) {
+      // Lichess would reject this anyway; say so without burning a request.
+      banner.show('Lichess only pairs Rapid or slower here.', 'error', 5000);
+      show('idle');
+      return;
+    }
     rated = isRated;
     saveRated(isRated);
     seekingScreen.render(preset, isRated);
