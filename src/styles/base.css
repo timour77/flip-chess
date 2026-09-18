@@ -1,10 +1,24 @@
 /*
  * Design tokens and the outer layout shell.
  *
- * Target viewport: the Galaxy Z Flip cover screen — roughly 350x380 CSS px of
- * usable area, but the app must also survive a normal phone screen. Every size
- * that matters is derived from `--unit`, which is driven by the smaller of the
- * two viewport axes so the board always fits without scrolling.
+ * Device facts (researched — do not re-derive, do not hardcode a pixel size
+ * anywhere that depends on these being exact):
+ *   - Target device: Galaxy Z Flip 7 cover screen ("Infinity FlexWindow"),
+ *     4.1 inch, 1048 x 948 physical px, ~345 ppi.
+ *   - That is NEAR-SQUARE (~1.11:1), not the "narrow and very tall" shape
+ *     the original design assumed. In CSS px the viewport is therefore
+ *     roughly 350-400 wide by 320-360 tall — the exact DPR is unknown and
+ *     unverifiable from here, so layout math uses vw/dvh, never a literal
+ *     pixel count.
+ *   - The two camera lenses sit in the BOTTOM-RIGHT corner when the phone
+ *     is folded; the display wraps around them. Samsung does not publish
+ *     the cutout's exact coordinates, so the reserved area is the tunable
+ *     `--camera-reserve` custom property (see app.css), not a magic number.
+ *
+ * Layout consequence: the board is flush against the top edge (no vertical
+ * centring) and as large as the viewport allows; a single bottom strip
+ * (`--bottom-strip`) holds the clocks and controls, staying clear of the
+ * camera cluster via `--camera-reserve`. See app.css for that strip.
  */
 
 :root {
@@ -33,10 +47,21 @@
   --tap-min: 44px;
 
   /*
-   * The board is square and is the dominant element: it takes the full width,
-   * capped so that board + two clocks + controls still fit vertically.
+   * Bottom chrome, tuned to be as small as legibility/tappability allow so
+   * the board (below) gets the rest of the screen. See app.css for the strip
+   * that consumes these two.
    */
-  --board-size: min(100vw, calc(100dvh - 9.5rem));
+  --bottom-strip: 3.5rem;
+  /* Keeps the strip's right edge clear of the bottom-right camera cluster.
+     Tune this on the physical device once the cutout can be seen. */
+  --camera-reserve: 4.5rem;
+
+  /*
+   * The board is square, flush to the top edge, and is the dominant element:
+   * it takes the full width, capped only by the height left after the bottom
+   * strip, so it's as large as will fit without ever scrolling the page.
+   */
+  --board-size: min(100vw, calc(100dvh - var(--bottom-strip)));
   --square: calc(var(--board-size) / 8);
 
   color-scheme: dark;
@@ -88,9 +113,10 @@ body {
   display: flex;
 }
 
+/* Board flush to the top; nothing centres it vertically. */
 #screen-game[data-active] {
-  justify-content: center;
-  gap: 0.25rem;
+  justify-content: flex-start;
+  gap: 0;
 }
 
 /* Transient error / status banner, pinned to the top of the viewport. */

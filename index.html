@@ -23,10 +23,20 @@
       <section id="screen-idle" class="screen" data-screen="idle"></section>
       <section id="screen-seeking" class="screen" data-screen="seeking"></section>
       <section id="screen-game" class="screen" data-screen="game">
-        <div id="clock-opponent" class="clock" data-side="opponent"></div>
         <div id="board"></div>
-        <div id="clock-own" class="clock" data-side="own"></div>
-        <div id="controls"></div>
+        <!--
+          Bottom strip: clocks (bottom-left) + controls, with the right edge
+          reserved for the cover-screen camera cluster. See app.css
+          (--bottom-strip, --camera-reserve) and base.css's header comment.
+        -->
+        <div class="bottom-strip">
+          <div class="clocks-group">
+            <div id="clock-opponent" class="clock" data-side="opponent"></div>
+            <div id="clock-own" class="clock" data-side="own"></div>
+          </div>
+          <div id="controls"></div>
+          <div class="camera-reserve" aria-hidden="true"></div>
+        </div>
       </section>
       <section id="screen-result" class="screen" data-screen="result"></section>
       <div id="banner" class="banner" hidden></div>

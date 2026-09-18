@@ -18,6 +18,8 @@
  */
 
 import type { GameView } from '../types';
+import { iconElement } from './icons';
+import type { IconName } from './icons';
 
 const HOLD_MS = 600;
 
@@ -76,7 +78,7 @@ interface HoldButton {
   label: HTMLSpanElement;
 }
 
-function makeHoldButton(label: string, extraClass: string): HoldButton {
+function makeHoldButton(label: string, extraClass: string, icon: IconName): HoldButton {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = `ctrl-btn hold-btn ${extraClass}`;
@@ -87,17 +89,22 @@ function makeHoldButton(label: string, extraClass: string): HoldButton {
 
   const text = document.createElement('span');
   text.className = 'ctrl-label';
-  text.textContent = label;
+  text.appendChild(iconElement(icon));
   button.appendChild(text);
+  // The word lives here rather than on screen: the strip is too narrow for it.
+  button.setAttribute('aria-label', label);
+  button.title = label;
 
   return { button, label: text };
 }
 
-function makeTapButton(label: string, extraClass: string): HTMLButtonElement {
+function makeTapButton(label: string, extraClass: string, icon: IconName): HTMLButtonElement {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = `ctrl-btn ${extraClass}`;
-  button.textContent = label;
+  button.appendChild(iconElement(icon));
+  button.setAttribute('aria-label', label);
+  button.title = label;
   return button;
 }
 
@@ -108,12 +115,12 @@ export function createControls(root: HTMLElement, handlers: ControlsHandlers): C
   const row = document.createElement('div');
   row.className = 'controls-row';
 
-  const resign = makeHoldButton('Resign', 'ctrl-resign');
-  const drawOffer = makeHoldButton('Offer draw', 'ctrl-draw-offer');
+  const resign = makeHoldButton('Resign', 'ctrl-resign', 'flag');
+  const drawOffer = makeHoldButton('Offer draw', 'ctrl-draw-offer', 'scales');
   const resignBtn = resign.button;
   const drawOfferBtn = drawOffer.button;
-  const acceptBtn = makeTapButton('Accept draw', 'ctrl-accept');
-  const declineBtn = makeTapButton('Decline', 'ctrl-decline');
+  const acceptBtn = makeTapButton('Accept draw', 'ctrl-accept', 'check');
+  const declineBtn = makeTapButton('Decline draw', 'ctrl-decline', 'cross');
 
   const cleanupResign = attachHoldToConfirm(resignBtn, handlers.onResign);
   const cleanupOffer = attachHoldToConfirm(drawOfferBtn, handlers.onOfferDraw);
@@ -147,6 +154,7 @@ export function createControls(root: HTMLElement, handlers: ControlsHandlers): C
   function update(view: GameView): void {
     if (view.finished) {
       setDisabled(true);
+      resignBtn.hidden = false;
       drawOfferBtn.hidden = false;
       acceptBtn.hidden = true;
       declineBtn.hidden = true;
@@ -156,6 +164,9 @@ export function createControls(root: HTMLElement, handlers: ControlsHandlers): C
     resignBtn.disabled = false;
 
     if (view.drawOfferFromOpponent) {
+      // Three icon buttons fit the strip comfortably, so resigning stays
+      // available while an offer is pending.
+      resignBtn.hidden = false;
       drawOfferBtn.hidden = true;
       acceptBtn.hidden = false;
       declineBtn.hidden = false;
@@ -164,6 +175,7 @@ export function createControls(root: HTMLElement, handlers: ControlsHandlers): C
       return;
     }
 
+    resignBtn.hidden = false;
     drawOfferBtn.hidden = false;
     acceptBtn.hidden = true;
     declineBtn.hidden = true;
@@ -171,11 +183,13 @@ export function createControls(root: HTMLElement, handlers: ControlsHandlers): C
     if (view.drawOfferFromMe) {
       drawOfferBtn.disabled = true;
       drawOfferBtn.classList.add('pending');
-      drawOffer.label.textContent = 'Draw offered…';
+      drawOfferBtn.setAttribute('aria-label', 'Draw offered');
+      drawOfferBtn.title = 'Draw offered';
     } else {
       drawOfferBtn.disabled = false;
       drawOfferBtn.classList.remove('pending');
-      drawOffer.label.textContent = 'Offer draw';
+      drawOfferBtn.setAttribute('aria-label', 'Offer draw');
+      drawOfferBtn.title = 'Offer draw';
     }
   }
 

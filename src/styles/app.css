@@ -1,8 +1,12 @@
 /*
  * Styles for the clock readouts, control row, banner content, and the
- * non-board screens (token / idle / seeking / result). Tall-narrow-first:
- * nothing here may cause the page to scroll, and every tappable element is
- * at least --tap-min, which base.css sets to 44px.
+ * non-board screens (token / idle / seeking / result). Nothing here may
+ * cause the page to scroll, and every tappable element is at least
+ * --tap-min, which base.css sets to 44px.
+ *
+ * The in-game bottom strip is squeezed: it shares ~350-400 CSS px of width
+ * between the two clocks, the controls and the camera reserve, so its type
+ * is intentionally small — the board above it is the point.
  */
 
 :root {
@@ -10,24 +14,79 @@
 }
 
 /* ------------------------------------------------------------------ *
+ * Bottom strip (#screen-game only): clocks, controls, camera reserve
+ * ------------------------------------------------------------------ */
+
+.bottom-strip {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: var(--bottom-strip);
+  gap: 0.35rem;
+  padding: 0.2rem 0.35rem;
+  padding-bottom: calc(0.2rem + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* Reserved dead space on the right so nothing sits under the camera
+   cluster. Width only — deliberately unstyled otherwise, and tuned on the
+   physical device via --camera-reserve (base.css). */
+.camera-reserve {
+  flex: 0 0 var(--camera-reserve);
+}
+
+/* ------------------------------------------------------------------ *
  * Clock
  * ------------------------------------------------------------------ */
 
+.clocks-group {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  gap: 0.3rem;
+}
+
 .clock {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  padding: 0.15rem 0;
+  min-width: 4.2rem;
+  padding: 0 0.2rem;
+}
+
+/* Caption identifying which clock is which — see data-side in index.html. */
+.clock::before {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 0.1rem;
+}
+
+.clock[data-side='own']::before {
+  content: 'You';
+  color: var(--accent);
+}
+
+.clock[data-side='opponent']::before {
+  content: 'Opponent';
+  color: var(--text-dim);
 }
 
 .clock-digits {
   font-family: ui-monospace, 'SFMono-Regular', Consolas, 'Roboto Mono', monospace;
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
-  font-size: 1.9rem;
+  /* Fixed to the widest reading ("20:00", the longest preset) so a digit
+     changing width (e.g. 9:59 -> 10:00) never reflows the strip. */
+  min-width: 5ch;
+  display: inline-block;
+  text-align: center;
+  font-size: 1.3rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   color: var(--text);
   transition: color 150ms ease;
 }
@@ -48,31 +107,60 @@
  * Controls
  * ------------------------------------------------------------------ */
 
+#controls {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+
+/*
+ * Icon buttons. Word labels did not fit beside the camera reserve — "Resign"
+ * and "Offer draw" ellipsised to "Re…" and "Offer …" — so the controls are
+ * square pictograms carrying their wording in aria-label/title.
+ */
+.ctrl-btn .icon,
+.ctrl-btn > .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: block;
+}
+
 .controls-row {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.3rem;
   width: 100%;
-  padding: 0.25rem 0.5rem;
+  min-width: 0;
 }
 
 .draw-group {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.3rem;
   flex: 2;
+  min-width: 0;
 }
 
 .ctrl-btn {
-  flex: 1;
+  /* Square: the glyph is the label, so there is nothing to grow for. */
+  flex: 0 0 auto;
+  width: var(--tap-target);
   min-height: var(--tap-target);
+  padding: 0;
   position: relative;
   overflow: hidden;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.ctrl-resign {
-  flex: 1;
+/*
+ * `display: flex` above outranks the user-agent rule that hides [hidden]
+ * elements, so without this the accept/decline buttons stay on screen in
+ * states that hide them.
+ */
+.ctrl-btn[hidden] {
+  display: none;
 }
 
 .hold-btn {
@@ -101,6 +189,11 @@
 .ctrl-label {
   position: relative;
   z-index: 1;
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .hold-btn.pending {
