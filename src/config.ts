@@ -18,8 +18,6 @@ export const TIME_CONTROLS: TimeControlPreset[] = [
   { id: '15+10', label: '15+10 Rapid', time: 15, increment: 10 },
 ];
 
-export const DEFAULT_PRESET_ID = '3+2';
-
 /** How long the result screen stays up before returning to idle. */
 export const RESULT_SCREEN_MS = 4000;
 

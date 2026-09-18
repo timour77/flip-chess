@@ -9,7 +9,6 @@
 
 const TOKEN_KEY = 'flipchess.token';
 const RATED_KEY = 'flipchess.rated';
-const PRESET_KEY = 'flipchess.preset';
 
 /** localStorage throws in some privacy modes; never let that break the app. */
 function safeGet(key: string): string | null {
@@ -55,12 +54,4 @@ export function loadRated(): boolean {
 
 export function saveRated(rated: boolean): void {
   safeSet(RATED_KEY, String(rated));
-}
-
-export function loadPresetId(): string | null {
-  return safeGet(PRESET_KEY);
-}
-
-export function savePresetId(id: string): void {
-  safeSet(PRESET_KEY, id);
 }
