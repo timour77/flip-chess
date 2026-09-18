@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [master]
+  # Lets the deploy be re-run by hand, e.g. after Pages is first provisioned.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -27,6 +29,11 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # Provisions the Pages site on the first run instead of failing with
+          # "Get Pages site failed". Needs the pages: write permission granted
+          # above, and is a no-op once the site exists.
+          enablement: true
 
       - name: Install dependencies and build
         run: npm ci && npm run build
